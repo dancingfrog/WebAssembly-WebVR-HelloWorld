@@ -221,8 +221,7 @@ static void nonVrLoop()
 				{
 					// If we like those caps, use the device
 					gDisplay = display;
-					char* devName = emscripten_vr_get_display_name(display);
-					printf("Using VRDisplay '%s' (displayId '%d')\n", devName, display);
+					printf("Using VRDisplay '%s' (displayId '%d')\n",  emscripten_vr_get_display_name(display), display);
 
 					printf("Display Capabilities:\n"
 						"{hasPosition: %d, hasExternalDisplay: %d, canPresent: %d, maxLayers: %lu}\n",
@@ -284,13 +283,15 @@ static void vrLoop()
 	}
 }
 
+void emscripten_init_callback (void *unused) {}
+
 int main()
 {
 	// Start GL
 	initGL();
 
 	// Start VR system
-	if (!emscripten_vr_init())
+	if (!emscripten_vr_init(emscripten_init_callback, NULL))
 	{
 		fprintf(stderr, "Browser does not support WebVR\n");
 	}
@@ -298,10 +299,11 @@ int main()
 	{
 		printf("Browser is running WebVR version %d.%d\n",
 			emscripten_vr_version_major(),
-			emscripten_vr_version_minor());
-	}
+			emscripten_vr_version_minor()
+		);
 
-	emscripten_set_main_loop(nonVrLoop, 0, 0);
+		emscripten_set_main_loop(nonVrLoop, 0, 0);
+	}
 
 	return 0;
 }
